@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>VeriFied-AI | Forensic Auditor Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="page">
+        <header class="page-header">
+            <h1>VeriFied-AI</h1>
+            <p class="subtitle">Automated Forensic Compliance Auditor</p>
+        </header>
+
+        <section class="input-panel">
+            <form action="/audit" method="post">
+                <label for="input_text">Submit Record / Statement for Audit</label>
+                <textarea
+                    id="input_text"
+                    name="input_text"
+                    rows="8"
+                    placeholder="Paste financial statement, transaction log, or compliance record text here..."
+                    required
+                >{{ submitted_text or "" }}</textarea>
+                <button type="submit" class="run-btn">Run Automated Forensic Audit</button>
+            </form>
+        </section>
+
+        {% if audit %}
+        <section class="result-card verdict-{{ audit.verdict | lower | replace(' ', '-') }}">
+            <div class="result-header">
+                <h2>Audit Result</h2>
+                <span class="timestamp">{{ audit.timestamp }}</span>
+            </div>
+
+            <div class="result-grid">
+                <div class="result-metric">
+                    <span class="metric-label">Verdict</span>
+                    <span class="metric-value verdict-tag">{{ audit.verdict }}</span>
+                </div>
+                <div class="result-metric">
+                    <span class="metric-label">Health Integrity Score</span>
+                    <span class="metric-value">{{ audit.system_health_index }} / 100</span>
+                </div>
+            </div>
+
+            <div class="summary-block">
+                <h3>Executive Summary</h3>
+                <p>{{ audit.summary_notes }}</p>
+            </div>
+
+            <div class="anomalies-block">
+                <h3>Detected Anomalies ({{ audit.anomalies_detected | length }})</h3>
+                {% if audit.anomalies_detected %}
+                    {% for anomaly in audit.anomalies_detected %}
+                    <div class="anomaly-box">
+                        <span class="anomaly-type">{{ anomaly.type }}</span>
+                        <p class="anomaly-description">{{ anomaly.description }}</p>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="no-anomalies">No anomalies detected in this record.</p>
+                {% endif %}
+            </div>
+        </section>
+        {% else %}
+        <p class="empty-state">No audits have been run yet. Submit a record above to get started.</p>
+        {% endif %}
+    </div>
+</body>
+</html>
